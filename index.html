@@ -108,19 +108,12 @@
       <legend>Parties and dates</legend>
       <label><span>Studio name</span><input id="studio" placeholder="Studio or company name"></label>
       <label><span>Studio address</span><input id="studioAddr" placeholder="Street, suburb, state, postcode"></label>
-      <div class="row">
-        <label><span>Effective date</span><input id="effective" placeholder="e.g. 1 December 2026"></label>
-        <label><span>Start date</span><input id="start" placeholder="e.g. 1 December 2026"></label>
-      </div>
+      <label><span>Start date</span><input id="start" placeholder="e.g. 1 December 2026"></label>
     </fieldset>
 
     <fieldset>
       <legend>Game</legend>
       <label><span>Game title</span><input id="game" placeholder="Game title"></label>
-      <label><span>Development stage</span>
-        <select id="stage">
-          <option>Alpha</option><option>Beta</option><option>Demo</option><option>Released</option>
-        </select></label>
     </fieldset>
 
     <fieldset>
@@ -128,7 +121,6 @@
       <label><span>Reporting method and timing</span>
         <textarea id="reporting">No fixed reporting cycle. Findings shared as they arise; summary available on request</textarea></label>
       <label><span>Build delivery method</span><input id="delivery" placeholder="Steam key / shared drive / other"></label>
-      <label><span>Test focus for first cycle</span><input id="focus" placeholder="Agreed areas or features"></label>
     </fieldset>
 
     <fieldset id="activeOnly">
@@ -160,8 +152,8 @@
 
 <script>
 var tier = 'Coverage';
-var ids = ['studio','studioAddr','effective','start','game','stage',
-  'reporting','delivery','focus','days','term',
+var ids = ['studio','studioAddr','start','game',
+  'reporting','delivery','days','term',
   'studioContact','fee','billing'];
 
 var DEFAULTS = {
@@ -237,7 +229,6 @@ function gameLine(){
 function scheduleRows(){
   var rows = [
     ['Game or games in scope', gameLine()],
-    ['Development stage', esc(v('stage'))],
     ['Service tier', tier]
   ];
   if(tier==='Active'){
@@ -255,7 +246,6 @@ function scheduleRows(){
     : 'Optional, at any time, from the Studio contact to the QA Lead']);
   rows.push(['Reporting method and timing', f('reporting','reporting method')]);
   rows.push(['Build delivery method', f('delivery','to be confirmed')]);
-  rows.push(['Test focus for first cycle', f('focus','agreed areas or features')]);
   rows.push(['QA Lead contact', FIXED.qaLead]);
   rows.push(['Studio contact', f('studioContact','name, role, email')]);
   var billTxt = v('billing')==='advance' ? 'payable monthly in advance' : 'invoiced monthly in arrears';
@@ -271,7 +261,7 @@ function body(){
 
   h += '<h2>Quality Assurance (QA) Service Agreement</h2>';
   h += '<p><b>Youth Options: Raising the Game</b></p>';
-  h += '<p>This Agreement is made effective as of ' + f('effective','Month, Year') + ', by and between:</p>';
+  h += '<p>This Agreement is made between:</p>';
   h += '<p><b>Youth Options</b><br>40 Sturt St, Adelaide SA 5000<br>(referred to in this Agreement as &ldquo;Youth Options&rdquo;)</p>';
   h += '<p><b>AND</b></p>';
   h += '<p><b>' + studio + '</b><br>' + f('studioAddr','Studio address') +
@@ -392,7 +382,7 @@ function body(){
   return h;
 }
 
-var STANDARD = { stage:'Alpha', billing:'arrears' };
+var STANDARD = { billing:'arrears' };
 function clearForm(){
   if(!confirm('Clear all studio details and start again?')) return;
   ids.forEach(function(id){

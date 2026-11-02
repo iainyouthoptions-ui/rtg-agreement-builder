@@ -41,6 +41,7 @@ In the `FIXED` object:
 
 - Commitment is **testing days, not tester hours**. A testing day = a scheduled floor day with at least one assigned tester on the studio's game. Hours caused the original Kyoti dispute.
 - No build version or platform fields.
+- No effective date, development stage or first-cycle test focus fields. The agreement opens "This Agreement is made between:" and the start date in clause 11 is the only date.
 - No "Continuation beyond the initial period" bullet in clause 5 — it contradicted the rolling term in clause 11.
 - No disclaimer about not retesting old bugs — regression checking is part of RTG's process.
 - No "Studio may describe the QA service at its own discretion" line in clause 8.
