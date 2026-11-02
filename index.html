@@ -1,0 +1,435 @@
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>RTG QA Service Agreement Builder</title>
+<style>
+  :root{
+    --paper:#FBFAF7; --ink:#16223B; --ink-soft:#3B4A66; --rule:#D9D5CA;
+    --muted:#6E6A62; --accent:#B4690E; --accent-soft:#F3E7D2;
+    --active:#1D5B4C; --coverage:#5A4B86; --field:#FFFFFF;
+  }
+  *{box-sizing:border-box}
+  body{margin:0;background:var(--paper);color:var(--ink);
+    font:15px/1.5 ui-sans-serif,-apple-system,"Segoe UI",Roboto,sans-serif;}
+  .mono{font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;}
+
+  header{border-bottom:1px solid var(--rule);padding:18px 24px;display:flex;
+    align-items:baseline;gap:16px;flex-wrap:wrap;background:#fff;}
+  header h1{margin:0;font-size:17px;letter-spacing:-.01em;font-weight:650;}
+  header .sub{font-size:12px;color:var(--muted);letter-spacing:.08em;text-transform:uppercase;}
+
+  .wrap{display:grid;grid-template-columns:minmax(320px,420px) 1fr;min-height:calc(100vh - 61px);}
+  @media(max-width:900px){.wrap{grid-template-columns:1fr}}
+
+  .form{padding:22px 24px 60px;border-right:1px solid var(--rule);background:var(--paper);}
+  .doc{padding:22px 24px 60px;background:#fff;overflow-x:auto;}
+
+  fieldset{border:0;padding:0;margin:0 0 26px;}
+  legend{font-size:11px;letter-spacing:.12em;text-transform:uppercase;color:var(--muted);
+    padding:0 0 8px;border-bottom:1px solid var(--rule);width:100%;margin-bottom:12px;}
+
+  label{display:block;margin-bottom:12px;}
+  label > span{display:block;font-size:11px;letter-spacing:.06em;text-transform:uppercase;
+    color:var(--ink-soft);margin-bottom:4px;font-family:ui-monospace,SFMono-Regular,Menlo,monospace;}
+  input,select,textarea{width:100%;padding:7px 9px;border:1px solid var(--rule);border-radius:2px;
+    background:var(--field);color:var(--ink);font:14px/1.4 inherit;}
+  input:focus,select:focus,textarea:focus{outline:2px solid var(--accent);outline-offset:-1px;border-color:var(--accent);}
+  textarea{resize:vertical;min-height:52px;}
+  .row{display:grid;grid-template-columns:1fr 1fr;gap:10px;}
+
+  .tierpick{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:6px;}
+  .tierpick button{padding:10px 8px;border:1px solid var(--rule);background:#fff;border-radius:2px;
+    cursor:pointer;text-align:left;font:inherit;color:var(--ink);}
+  .tierpick button b{display:block;font-size:14px;margin-bottom:2px;}
+  .tierpick button small{color:var(--muted);font-size:11px;line-height:1.3;display:block;}
+  .tierpick button[aria-pressed=true]{border-color:currentColor;border-width:2px;padding:9px 7px;}
+  #btnActive[aria-pressed=true]{color:var(--active);background:#F1F7F5;}
+  #btnCoverage[aria-pressed=true]{color:var(--coverage);background:#F5F3FA;}
+
+  .clauses{margin:14px 0 24px;font-size:12px;}
+  .clauses li{list-style:none;padding:3px 0;border-bottom:1px dotted var(--rule);
+    display:flex;justify-content:space-between;gap:10px;
+    font-family:ui-monospace,SFMono-Regular,Menlo,monospace;}
+  .clauses li.off{color:#B3AFA6;text-decoration:line-through;}
+  .clauses li span:last-child{font-size:10px;letter-spacing:.06em;text-transform:uppercase;}
+  .clauses li.on span:last-child{color:var(--accent);}
+
+  .actions{position:sticky;bottom:0;background:linear-gradient(transparent,var(--paper) 22%);
+    padding:18px 0 0;display:flex;gap:8px;flex-wrap:wrap;}
+  .actions button{padding:9px 14px;border-radius:2px;border:1px solid var(--ink);
+    background:var(--ink);color:#fff;font:13px/1 inherit;cursor:pointer;}
+  .actions button.ghost{background:transparent;color:var(--ink);}
+  .actions button:hover{opacity:.88}
+
+  .paperdoc{max-width:760px;font-family:Georgia,"Times New Roman",serif;font-size:14.5px;line-height:1.62;}
+  .paperdoc h2{font-family:ui-sans-serif,-apple-system,sans-serif;font-size:20px;margin:0 0 2px;}
+  .paperdoc h3{font-family:ui-sans-serif,-apple-system,sans-serif;font-size:13px;
+    letter-spacing:.02em;color:var(--ink-soft);margin:22px 0 6px;}
+  .paperdoc h4{font-family:ui-sans-serif,-apple-system,sans-serif;font-size:12px;margin:14px 0 4px;}
+  .paperdoc p{margin:0 0 9px;}
+  .paperdoc ul{margin:0 0 9px;padding-left:20px;}
+  .paperdoc li{margin-bottom:4px;}
+  .paperdoc table{border-collapse:collapse;width:100%;font-size:13px;margin:8px 0 14px;
+    font-family:ui-sans-serif,-apple-system,sans-serif;}
+  .paperdoc th,.paperdoc td{border:1px solid var(--rule);padding:5px 8px;text-align:left;vertical-align:top;}
+  .paperdoc th{background:#F2F0EB;font-size:11px;letter-spacing:.06em;text-transform:uppercase;}
+  .paperdoc td:first-child{width:38%;font-weight:600;}
+  .fillme{background:var(--accent-soft);padding:0 3px;border-radius:2px;}
+  .sig{margin-top:6px;}
+  .sig div{margin:14px 0;border-bottom:1px solid var(--rule);padding-bottom:2px;max-width:320px;
+    font-family:ui-sans-serif,sans-serif;font-size:12px;color:var(--muted);}
+  .note{font-size:12px;color:var(--muted);margin:-4px 0 14px;}
+  @media print{
+    header,.form{display:none !important;}
+    .wrap{display:block;}
+    .doc{padding:0;}
+    .fillme{background:none;}
+  }
+</style>
+
+<header>
+  <h1>QA Service Agreement Builder</h1>
+  <span class="sub mono">Raising the Game &middot; Youth Options</span>
+</header>
+
+<div class="wrap">
+  <div class="form">
+    <fieldset>
+      <legend>Service tier</legend>
+      <div class="tierpick">
+        <button id="btnActive" aria-pressed="false" onclick="setTier('Active')">
+          <b>Active</b><small>Weekly cycle, committed testing days, initial term</small></button>
+        <button id="btnCoverage" aria-pressed="true" onclick="setTier('Coverage')">
+          <b>Coverage</b><small>Capacity permitting, no commitment, rolling monthly</small></button>
+      </div>
+      <ul class="clauses" id="clauseList"></ul>
+    </fieldset>
+
+    <fieldset>
+      <legend>Parties and dates</legend>
+      <label><span>Studio name</span><input id="studio" placeholder="Studio or company name"></label>
+      <label><span>Studio address</span><input id="studioAddr" placeholder="Street, suburb, state, postcode"></label>
+      <div class="row">
+        <label><span>Effective date</span><input id="effective" placeholder="e.g. 1 December 2026"></label>
+        <label><span>Start date</span><input id="start" placeholder="e.g. 1 December 2026"></label>
+      </div>
+    </fieldset>
+
+    <fieldset>
+      <legend>Game</legend>
+      <label><span>Game title</span><input id="game" placeholder="Game title"></label>
+      <label><span>Development stage</span>
+        <select id="stage">
+          <option>Alpha</option><option>Beta</option><option>Demo</option><option>Released</option>
+        </select></label>
+    </fieldset>
+
+    <fieldset>
+      <legend>Delivery</legend>
+      <label><span>Reporting method and timing</span>
+        <textarea id="reporting">No fixed reporting cycle. Findings shared as they arise; summary available on request</textarea></label>
+      <label><span>Build delivery method</span><input id="delivery" placeholder="Steam key / shared drive / other"></label>
+      <label><span>Test focus for first cycle</span><input id="focus" placeholder="Agreed areas or features"></label>
+    </fieldset>
+
+    <fieldset id="activeOnly">
+      <legend>Active tier commitments</legend>
+      <label><span>Committed testing days per month</span><input id="days" placeholder="6"></label>
+      <label><span>Initial term</span><input id="term" placeholder="3 months"></label>
+    </fieldset>
+
+    <fieldset>
+      <legend>Contacts and fee</legend>
+      <label><span>Studio contact</span><input id="studioContact" placeholder="Name, role, email"></label>
+      <label><span>Monthly fee (AUD)</span><input id="fee" value="150"></label>
+      <label><span>Billing timing</span>
+        <select id="billing">
+          <option value="arrears">Monthly in arrears (billed at month end)</option>
+          <option value="advance">Monthly in advance (billed at month start)</option>
+        </select></label>
+    </fieldset>
+
+    <div class="actions">
+      <button onclick="downloadDoc()">Download as Word</button>
+      <button class="ghost" onclick="window.print()">Print / PDF</button>
+      <button class="ghost" onclick="clearForm()">Clear form</button>
+    </div>
+  </div>
+
+  <div class="doc"><div class="paperdoc" id="preview"></div></div>
+</div>
+
+<script>
+var tier = 'Coverage';
+var ids = ['studio','studioAddr','effective','start','game','stage',
+  'reporting','delivery','focus','days','term',
+  'studioContact','fee','billing'];
+
+var DEFAULTS = {
+  Active:   { fee:'300', reporting:'End of week catch up call each Friday, with the bug register kept current throughout the week' },
+  Coverage: { fee:'150', reporting:'No fixed reporting cycle. Findings shared as they arise; summary available on request' }
+};
+function setTier(t){
+  var other = t==='Active' ? 'Coverage' : 'Active';
+  ['fee','reporting'].forEach(function(k){
+    var el = document.getElementById(k);
+    if(el && (el.value.trim()==='' || el.value.trim()===DEFAULTS[other][k])) el.value = DEFAULTS[t][k];
+  });
+  tier = t;
+  document.getElementById('btnActive').setAttribute('aria-pressed', t==='Active');
+  document.getElementById('btnCoverage').setAttribute('aria-pressed', t==='Coverage');
+  document.getElementById('activeOnly').style.display = t==='Active' ? '' : 'none';
+  render();
+}
+
+function v(id){
+  var el = document.getElementById(id);
+  var val = el ? el.value.trim() : '';
+  return val;
+}
+function f(id, placeholder){
+  var val = v(id);
+  return val ? esc(val) : '<span class="fillme">[' + placeholder + ']</span>';
+}
+var FIXED = {
+  floorDays: 'Wednesday, Thursday, Friday',
+  briefDue: 'Close of business Tuesday',
+  qaLead: 'Iain Dalrymple, Coordinator \u2013 QA for Gaming, iain.d@youthoptions.org.au, (08) 8166 3852'
+};
+function lcFirst(s){ return s ? s.charAt(0).toLowerCase() + s.slice(1) : s; }
+function esc(s){
+  return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+}
+
+function clauseMap(){
+  return [
+    ['1. Purpose', true],
+    ['2. Services provided', true],
+    ['3. Delivery and cycle brief', true],
+    ['3. Capacity and cadence', tier==='Active'],
+    ['3A. Coverage tier', tier==='Coverage'],
+    ['4. Build access and readiness', true],
+    ['5. Fees and commitment', true],
+    ['6. Communication and escalation', true],
+    ['7. Pausing the engagement', true],
+    ['8. Credit and acknowledgement', true],
+    ['9. Confidentiality and IP', true],
+    ['10. Termination', true],
+    ['11. Duration', true],
+    ['Schedule A', true]
+  ];
+}
+
+function renderClauseList(){
+  var html = clauseMap().map(function(c){
+    return '<li class="' + (c[1]?'on':'off') + '"><span>' + c[0] + '</span><span>' +
+      (c[1]?'included':'n/a') + '</span></li>';
+  }).join('');
+  document.getElementById('clauseList').innerHTML = html;
+}
+
+function gameLine(){
+  var parts = [];
+  if(v('game')) parts.push(esc(v('game')));
+  if(parts.length) parts.push('PC');
+  return parts.length ? parts.join(', ') : '<span class="fillme">[Game title]</span>';
+}
+
+function scheduleRows(){
+  var rows = [
+    ['Game or games in scope', gameLine()],
+    ['Development stage', esc(v('stage'))],
+    ['Service tier', tier]
+  ];
+  if(tier==='Active'){
+    rows.push(['Committed testing days per month', f('days','number of days')]);
+    rows.push(['Capacity review', 'Ongoing. The QA Lead updates the Studio weekly on team availability']);
+    rows.push(['Initial term', f('term','initial term')]);
+  } else {
+    rows.push(['Committed testing days per month', 'Not applicable under the Coverage tier']);
+    rows.push(['Capacity review', 'Not applicable under the Coverage tier']);
+    rows.push(['Initial term', 'Not applicable under the Coverage tier. Rolling monthly']);
+  }
+  rows.push(['Testing floor days', FIXED.floorDays + (tier==='Coverage' ? ' (capacity permitting)' : '')]);
+  rows.push(['Cycle brief due', tier==='Active'
+    ? FIXED.briefDue + ' each week, from the Studio contact to the QA Lead'
+    : 'Optional, at any time, from the Studio contact to the QA Lead']);
+  rows.push(['Reporting method and timing', f('reporting','reporting method')]);
+  rows.push(['Build delivery method', f('delivery','to be confirmed')]);
+  rows.push(['Test focus for first cycle', f('focus','agreed areas or features')]);
+  rows.push(['QA Lead contact', FIXED.qaLead]);
+  rows.push(['Studio contact', f('studioContact','name, role, email')]);
+  var billTxt = v('billing')==='advance' ? 'payable monthly in advance' : 'invoiced monthly in arrears';
+  rows.push(['Monthly service fee', v('fee') ? '$' + esc(v('fee')) + ' (AUD) per month, ' + billTxt
+    : '<span class="fillme">[fee]</span>']);
+  return rows.map(function(r){ return '<tr><td>' + r[0] + '</td><td>' + r[1] + '</td></tr>'; }).join('');
+}
+
+function body(){
+  var studio = v('studio') ? esc(v('studio')) : '<span class="fillme">[Studio name]</span>';
+  var isActive = tier === 'Active';
+  var h = '';
+
+  h += '<h2>Quality Assurance (QA) Service Agreement</h2>';
+  h += '<p><b>Youth Options: Raising the Game</b></p>';
+  h += '<p>This Agreement is made effective as of ' + f('effective','Month, Year') + ', by and between:</p>';
+  h += '<p><b>Youth Options</b><br>40 Sturt St, Adelaide SA 5000<br>(referred to in this Agreement as &ldquo;Youth Options&rdquo;)</p>';
+  h += '<p><b>AND</b></p>';
+  h += '<p><b>' + studio + '</b><br>' + f('studioAddr','Studio address') +
+       '<br>(referred to in this Agreement as &ldquo;the Studio&rdquo;)</p>';
+
+  h += '<h3>1. Purpose</h3>';
+  h += '<p>This Agreement sets out the terms under which Youth Options will provide Quality Assurance (QA) testing services for the Studio through the Raising the Game program.</p>';
+  h += '<p>Raising the Game is a social enterprise funded under the Australian Government WorkFoundations program. It delivers QA services to game studios while providing supported, paid work placements for young people building their skills and work readiness. Testing is carried out by placement testers and is planned, supervised, reviewed and signed off by the QA Lead before anything is sent to the Studio.</p>';
+
+  h += '<h3>2. Services provided</h3>';
+  h += '<p>Youth Options will provide QA testing and reporting for the game or games listed in Schedule A.</p>';
+  if(isActive){
+    h += '<ul><li>Structured playtesting and functional testing against an agreed test focus for each cycle.</li>' +
+         '<li>Written bug reports with clear reproduction steps, severity and supporting evidence.</li>' +
+         '<li>Reporting at the end of each cycle covering findings, coverage and observations, in the format agreed in Schedule A.</li>' +
+         '<li>Review and sign off by the QA Lead before delivery.</li>' +
+         '<li>A delivery call or presentation at the end of the engagement, or at agreed intervals, if requested by the Studio.</li></ul>';
+  } else {
+    h += '<ul><li>Testing of the Studio&rsquo;s build as testing floor capacity allows, without a guaranteed weekly cycle.</li>' +
+         '<li>Reporting of findings in the format agreed in Schedule A.</li>' +
+         '<li>Review and sign off by the QA Lead before delivery.</li></ul>';
+    h += '<p>The Coverage tier is intended for studios between active development phases who want continuity of testing at a lower commitment. It does not include a guaranteed effort commitment or a fixed reporting cycle.</p>';
+  }
+
+  h += '<h3>3. Delivery cycle, flexible scope and effort commitment</h3>';
+  h += isActive
+    ? '<p>This engagement is designed to be responsive. The Studio may change what is tested from cycle to cycle to suit its current development priorities. The commitment in this Agreement is to a volume of testing capacity, not to a fixed set of features. Scope is flexible; capacity is fixed.</p>'
+    : '<p>This engagement is designed to be responsive. The Studio may change what is tested to suit its current development priorities. Testing is provided as capacity allows, as set out in clause 3A.</p>';
+  h += '<h4>Cycle brief</h4>';
+  if(isActive){
+  h += '<ul><li>Before each testing cycle the Studio provides a short cycle brief: the build to be tested, what has changed, and what the Studio would like the team to focus on.</li>' +
+       '<li>The cycle brief is to be provided by ' + lcFirst(FIXED.briefDue) + ' for testing in that week. If no brief is received, the QA Lead will continue the previous focus or nominate a focus, and will confirm this with the Studio.</li>' +
+       '<li>The Studio may change the test focus at any time by agreement with the QA Lead. Changes requested part way through a cycle will be applied from the next available testing day.</li></ul>';
+  } else {
+  h += '<ul><li>The Studio may provide a cycle brief at any time: the build to be tested, what has changed, and what the Studio would like the team to focus on.</li>' +
+       '<li>If no brief is received, the QA Lead will continue the previous focus or nominate a focus.</li></ul>';
+  }
+
+  if(isActive){
+    h += '<h4>Capacity and cadence</h4>';
+    h += '<ul><li>Youth Options commits to a minimum number of testing days per calendar month on the Studio&rsquo;s game, as set out in Schedule A. A testing day is a scheduled testing floor day on which at least one assigned tester works on the Studio&rsquo;s game.</li>' +
+         '<li>Testing is carried out on the testing floor days set out in Schedule A. Testing capacity is not available outside those days.</li>' +
+         '<li>Findings are reported back to the Studio at the end of each cycle. The reporting method and timing are agreed with the Studio and recorded in Schedule A. This may be a written report, an updated bug register, a catch up call, or a combination, and may be varied by agreement between the QA Lead and the Studio.</li>' +
+         '<li>Whatever method is used, each cycle is reported against what was tested, what was found, and what was not reached.</li>' +
+         '<li>Where a cycle brief asks for more than the available capacity, the QA Lead will confirm with the Studio what will be covered in that cycle and what will carry into the next.</li>' +
+         '<li>Additional capacity beyond the committed testing days can be arranged subject to availability and agreed in writing before the additional work begins.</li>' +
+         '<li>Team size varies across the year as placements begin and end. The QA Lead will update the Studio weekly on team availability. Committed testing days may be varied by written agreement with no less than fourteen (14) days notice.</li></ul>';
+    h += '<p>Both parties acknowledge that the committed testing days are the full extent of the effort commitment under this Agreement. Flexibility of test focus does not change the volume of testing capacity provided. Any expectation of additional or continuous capacity must be agreed in writing and recorded in Schedule A.</p>';
+  } else {
+    h += '<h3>3A. Coverage tier</h3>';
+    h += '<ul><li>Testing is carried out on the Studio&rsquo;s game as testing floor capacity allows, alongside other engagements. There is no committed number of testing days and no guaranteed weekly cycle.</li>' +
+         '<li>Findings are shared with the Studio as they arise, in the format recorded in Schedule A. A summary of testing carried out can be provided on request.</li>' +
+         '<li>The QA Lead will advise the Studio if no testing capacity is expected to be available in a given month.</li>' +
+         '<li>The Studio may move to the Active tier at any time by written agreement, subject to available capacity. The Active tier commitments then apply from the agreed start date.</li></ul>';
+  }
+
+  h += '<h3>4. Build access and build readiness</h3>';
+  h += '<p>Access to builds will be provided by the Studio using an agreed method, such as Steam keys, a shared drive or a project management platform. The agreed method is recorded in Schedule A.</p>';
+  h += '<p>So that testing time is spent on testing, builds supplied for QA must:</p>';
+  h += '<ul><li>Install and launch without developer assistance.</li>' +
+       '<li>Be supplied with brief written notes on what has changed and/or what the Studio would like tested.</li></ul>';
+
+  h += '<h3>5. Fees and commitment</h3>';
+  h += '<ul><li>The monthly service fee and the service tier for this engagement are set out in Schedule A.</li>' +
+       '<li>' + (isActive ? 'The initial term for this engagement is set out in Schedule A.'
+                          : 'This engagement is month to month with no minimum commitment period.') + '</li>' +
+       '<li>' + (v('billing')==='advance'
+          ? 'Fees are payable monthly in advance and are not varied by the number of builds supplied or the test focus nominated in any cycle.'
+          : 'Fees are invoiced monthly in arrears at the end of each calendar month, and are not varied by the number of builds supplied or the test focus nominated in any cycle.') + '</li>' +
+       '<li>Invoices are issued by email and payable within three (3) weeks of the invoice date.</li></ul>';
+  h += '<p>Current fees reflect the delivery of this service during the WorkFoundations funded period, which concludes in June 2027. Youth Options will review its fees ahead of that date and will give the Studio no less than sixty (60) days written notice of any change to fees affecting a continuing engagement.</p>';
+
+  h += '<h3>6. Communication and escalation</h3>';
+  h += '<p>The QA Lead is the Studio&rsquo;s primary contact for anything relating to testing, reporting, scope or delivery. Contact details are recorded in Schedule A.</p>';
+  h += '<p>If the Studio has a concern about the service, including timeliness, quality or scope, the Studio is asked to raise it with the QA Lead so it can be addressed directly. Any concern about delivery raised with another member of Youth Options staff will be passed to the QA Lead within two (2) working days so it can be resolved against the terms of this Agreement.</p>';
+  h += '<p>Youth Options will notify the Studio promptly if anything is likely to affect delivery in a given cycle, including changes to team availability.</p>';
+
+  h += '<h3>7. Pausing the engagement</h3>';
+  h += '<p>Either party may request a pause, for example while the Studio prepares a significant new build. A pause must be agreed in writing and must record the start date and expected restart date.</p>';
+  h += '<ul><li>A pause may run for up to eight (8) weeks. Fees are not charged for full calendar months falling entirely within an agreed pause.</li>' +
+       (isActive ? '<li>The initial term is extended by the length of the pause.</li>' : '') +
+       '<li>If the engagement has not resumed by the agreed restart date, and no new date is agreed in writing within two (2) weeks of that date, the engagement is treated as concluded under clause 10.</li></ul>';
+  h += '<p>A pause is not a termination. If the Studio wishes to end the engagement, clause 10 applies.</p>';
+
+  h += '<h3>8. Credit and public acknowledgement</h3>';
+  h += '<ul><li>Youth Options is to receive a credit in the game where credits are listed, for example &ldquo;Quality Assurance provided by Youth Options, Raising the Game program&rdquo;.</li>' +
+       '<li>The Studio may, at its discretion, name individual QA testers in the credits.</li>' +
+       '<li>Youth Options may publicly refer to its involvement in providing QA for the game only after written confirmation from the Studio.</li></ul>';
+
+  h += '<h3>9. Confidentiality and intellectual property</h3>';
+  h += '<ul><li>All materials provided by the Studio, including builds, documentation and assets, remain the exclusive property of the Studio.</li>' +
+       '<li>Youth Options and all placement testers will treat those materials as confidential and will not disclose, copy or distribute any part of the game or related information to third parties.</li>' +
+       '<li>All testers working on the game are engaged under employment agreements that include confidentiality obligations.</li>' +
+       '<li>Test documentation, test cases and testing methods created by Youth Options remain the property of Youth Options. Findings, bug reports and recommendations relating to the game belong to the Studio.</li>' +
+       '<li>Confidentiality obligations continue after this Agreement ends, until released in writing by a member of the Youth Options executive team.</li></ul>';
+
+  h += '<h3>10. Termination</h3>';
+  h += '<ul><li>Either party may end this Agreement with ' +
+       (isActive ? 'fourteen (14)' : 'seven (7)') + ' days written notice.</li>' +
+       '<li>' + (v('billing')==='advance'
+          ? 'Fees are payable for the month in which the Agreement ends and are not apportioned. No fees are charged for any month beginning after that date.'
+          : 'A final invoice is issued for the month in which the Agreement ends. Fees are not apportioned and no fees are charged for any month beginning after that date.') + '</li>' +
+       '<li>On termination, Youth Options will deliver any completed testing documentation from the final cycle and will remove or destroy build files as directed by the Studio.</li></ul>';
+
+  h += '<h3>11. Duration</h3>';
+  h += '<p>This Agreement begins on ' + f('start','start date') + '.</p>';
+  h += '<p>' + (isActive
+    ? 'This Agreement continues for the initial term set out in Schedule A and then on a rolling monthly basis, unless extended, paused or terminated in accordance with this Agreement.'
+    : 'This Agreement continues on a rolling monthly basis until ended by either party in accordance with clause 10. There is no minimum commitment period.') + '</p>';
+
+  h += '<h3>Schedule A: Engagement details</h3>';
+  h += '<table><tr><th>Item</th><th>Detail</th></tr>' + scheduleRows() + '</table>';
+
+  h += '<h3>Acceptance and signatures</h3>';
+  h += '<p><b>For Youth Options</b></p><div class="sig"><div>Iain Dalrymple</div><div>Program Coordinator &amp; QA Lead</div><div>Signature</div><div>Date</div></div>';
+  h += '<p><b>For ' + studio + '</b></p><div class="sig"><div>Name</div><div>Title</div><div>Signature</div><div>Date</div></div>';
+
+  return h;
+}
+
+var STANDARD = { stage:'Alpha', billing:'arrears' };
+function clearForm(){
+  if(!confirm('Clear all studio details and start again?')) return;
+  ids.forEach(function(id){
+    var el = document.getElementById(id); if(!el) return;
+    el.value = STANDARD.hasOwnProperty(id) ? STANDARD[id] : '';
+  });
+  setTier('Coverage');
+  window.scrollTo(0,0);
+}
+
+function render(){
+  renderClauseList();
+  document.getElementById('preview').innerHTML = body();
+}
+
+function downloadDoc(){
+  var css = 'body{font-family:Arial,sans-serif;font-size:10pt;line-height:1.4;}' +
+    'h2{font-size:16pt;margin:0 0 4pt;}h3{font-size:11.5pt;color:#1F4E79;margin:14pt 0 4pt;}' +
+    'h4{font-size:10pt;margin:9pt 0 3pt;}table{border-collapse:collapse;width:100%;font-size:10pt;}' +
+    'th,td{border:1px solid #999;padding:4pt 6pt;text-align:left;vertical-align:top;}' +
+    'th{background:#EAEAEA;}td:first-child{width:36%;font-weight:bold;}' +
+    '.fillme{background:#FFF0C2;}.sig div{margin:10pt 0;border-bottom:1px solid #999;max-width:300pt;color:#555;}';
+  var html = '<html xmlns:o="urn:schemas-microsoft-com:office:office" ' +
+    'xmlns:w="urn:schemas-microsoft-com:office:word" xmlns="http://www.w3.org/TR/REC-html40">' +
+    '<head><meta charset="utf-8"><' + 'style>' + css + '</' + 'style></head><body>' + body() + '</body></html>';
+  var blob = new Blob(['\ufeff', html], {type:'application/msword'});
+  var name = 'QA_Service_Agreement_' + (v('studio') || 'Studio').replace(/[^A-Za-z0-9]+/g,'_') + '_' + tier + '.doc';
+  var a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = name;
+  document.body.appendChild(a); a.click(); document.body.removeChild(a);
+  setTimeout(function(){ URL.revokeObjectURL(a.href); }, 2000);
+}
+
+ids.forEach(function(id){
+  var el = document.getElementById(id);
+  if(el){ el.addEventListener('input', render); el.addEventListener('change', render); }
+});
+setTier('Coverage');
+</script>
