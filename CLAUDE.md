@@ -7,7 +7,7 @@ Owner: Iain Dalrymple, Coordinator – QA for Gaming. He reviews everything befo
 ## Files
 
 - `index.html` — the whole app. Markup, styles and script in one file. No build step, no dependencies.
-- `netlify.toml` — publishes the repo root as-is.
+- `netlify.toml` — copies `index.html` into `dist/` and publishes only that, so these notes stay off the public site.
 
 ## Deploy
 
